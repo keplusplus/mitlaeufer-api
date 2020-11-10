@@ -1,0 +1,14 @@
+{
+  "name": "mitlaeufer-api",
+  "version": "0.9.0",
+  "description": "Backend API for \"Mitlaeufer - hiking together\"",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mitlaeuferteam",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
