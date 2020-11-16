@@ -1,11 +1,11 @@
 const express = require('express')
-const swagger = require('swagger-ui-express')
-const yaml = require('yamljs')
-const swaggerdoc = yaml.load('public/swagger.yaml')
 const app = express()
 const port = 8080
+const router = require('./router')()
+const pJson = require('../package.json')
+const routePrefix = `/${pJson.name}/v${pJson.version.split('.')[0]}`
 
-app.use('/swagger', swagger.serve, swagger.setup(swaggerdoc))
+app.use(routePrefix, router)
 
 app.listen(port, () => {
   console.log(`Listening for requests on port ${port}...`)

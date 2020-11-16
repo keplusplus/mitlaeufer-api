@@ -1,17 +1,386 @@
 openapi: 3.0.0
 info:
-  title: Mitlaeufer API
-  description: Backend API for "Mitlaeufer - hiking together"
+  title: Mitläufer API
+  version: 0.9.0
+  contact:
+    name: keplusplus
+    email: ke@esudo.de
   license:
     name: MIT
-  version: 0.9.0
+    url: 'https://opensource.org/licenses/MIT'
+  description: Backend API for "Mitläufer - hiking together"
 servers:
-  - url: http://localhost:8080
-    description: Development API
+  - url: 'http://localhost:8080/mitlaeufer-api/v0'
+    description: dev
 paths:
-  /:
+  /hikes:
     get:
-      summary: Health check
+      summary: Get all hikes
+      tags:
+        - Hikes
       responses:
-        200:
+        '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/hike'
+              examples:
+                Example:
+                  value:
+                    - id: 7493
+                      leader: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+                      start:
+                        latitude: 50.1234
+                        longitude: 10.5678
+                      destination:
+                        latitude: 55.5678
+                        longitude: 15.1234
+                      begin: 1605552795
+                      estimatedArrival: 1605555900
+                      estimatedLength: 3200
+                      title: Example hike 1
+                      description: Please join my hike. Thank you!
+                    - id: 9281
+                      leader: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+                      start:
+                        latitude: 52.1234
+                        longitude: 12.5678
+                      destination:
+                        latitude: 57.5678
+                        longitude: 17.1234
+                      begin: 1605552795
+                      estimatedArrival: 1605555900
+                      estimatedLength: 3200
+                      title: Example hike 2
+                      description: Please join my hike. Thank you!
+      operationId: getHikes
+      description: Retrieve a list of all active or planned hikes.
+      parameters: []
+    post:
+      summary: Post hike
+      operationId: addHike
+      responses:
+        '200':
+          description: OK
+      description: Plan a new hike.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/hike'
+            examples:
+              Example:
+                value:
+                  start:
+                    latitude: 50.1234
+                    longitude: 10.5678
+                  destination:
+                    latitude: 55.5678
+                    longitude: 15.1234
+                  begin: 1605552795
+                  estimatedArrival: 1605555900
+                  estimatedLength: 3200
+                  title: Example hike
+                  description: Please join my hike. Thank you!
+              Example (minimal):
+                value:
+                  start:
+                    latitude: 50.1234
+                    longitude: 10.5678
+                  begin: 1605552795
+                  title: Example hike
+      tags:
+        - Hikes
+  '/hikes/{hikeId}':
+    parameters:
+      - schema:
+          type: integer
+        name: hikeId
+        in: path
+        description: Hike identifier
+        required: true
+    get:
+      summary: Get hike
+      tags:
+        - Hikes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hike'
+              examples:
+                Example:
+                  value:
+                    id: 7493
+                    leader: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+                    start:
+                      latitude: 50.1234
+                      longitude: 10.5678
+                    destination:
+                      latitude: 55.5678
+                      longitude: 15.1234
+                    begin: 1605552795
+                    estimatedArrival: 1605555900
+                    estimatedLength: 3200
+                    title: Example hike
+                    description: Please join my hike. Thank you!
+      operationId: getHike
+      description: Retrieve a specific hike by id.
+    patch:
+      summary: Patch hike
+      operationId: patchHike
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hike'
+              examples:
+                Example:
+                  value:
+                    id: 7493
+                    leader: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+                    start:
+                      latitude: 50.1234
+                      longitude: 10.5678
+                    destination:
+                      latitude: 55.5678
+                      longitude: 15.1234
+                    begin: 1605552795
+                    estimatedArrival: 1605555900
+                    estimatedLength: 3200
+                    title: Example hike
+                    description: Please join my hike. Thank you!
+      tags:
+        - Hikes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/hike'
+            examples:
+              Example (update destination and estimated arrival/length):
+                value:
+                  destination:
+                    latitude: 55.5678
+                    longitude: 15.1234
+                  estimatedArrival: 1605555900
+                  estimatedLength: 3200
+              Example (update title/description):
+                value:
+                  title: Example hike
+                  description: Please join my hike. Thank you!
+              Example (cancel a planned hike):
+                value:
+                  cancelled: true
+      description: Update a hike.
+  /members:
+    post:
+      summary: Register member
+      operationId: registerMember
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/member'
+              examples:
+                Example:
+                  value:
+                    id: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+                    username: example-hiker
+                    displayname: Example hiker
+                    hikesJoined: 0
+                    hikesLed: 0
+      description: Register a new member.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/member'
+            examples:
+              Example:
+                value:
+                  username: example-hiker
+                  displayname: Example hiker
+      tags:
+        - Members
+  '/members/{memberId}':
+    parameters:
+      - schema:
+          type: string
+        name: memberId
+        in: path
+        required: true
+        description: Member uuid
+    get:
+      summary: Patch member
+      tags:
+        - Members
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/member'
+              examples:
+                Example:
+                  value:
+                    id: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+                    username: example-hiker
+                    displayname: Example hiker
+                    hikesJoined: 3
+                    hikesLed: 1
+      operationId: getMember
+      description: Retrieve a specific hike by uuid.
+    patch:
+      summary: ''
+      operationId: updateMember
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/member'
+              examples:
+                Example:
+                  value:
+                    id: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+                    username: example-hiker
+                    displayname: My new display name
+                    hikesJoined: 3
+                    hikesLed: 1
+      description: Update a specific member.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/member'
+            examples:
+              Example:
+                value:
+                  displayname: My new display name
+      tags:
+        - Members
+components:
+  schemas:
+    hike:
+      title: Hike
+      type: object
+      description: 'Represents a completed, aborted, active or planned hike.'
+      x-examples:
+        'Example (no waypoints, no preferred ageband, not cancelled)':
+          id: 7493
+          leader: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+          start:
+            latitude: 50.1234
+            longitude: 10.5678
+          destination:
+            latitude: 55.5678
+            longitude: 15.1234
+          begin: 1605552795
+          estimatedArrival: 1605555900
+          estimatedLength: 3200
+          title: Example hike
+          description: Please join my hike. Thank you!
+      properties:
+        id:
+          type: integer
+          description: Numeric identifier
+        leader:
+          type: string
+          description: UUID of the leading member
+          format: uuid
+          example: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+        start:
+          $ref: '#/components/schemas/location'
+        destination:
+          $ref: '#/components/schemas/location'
+        begin:
+          type: number
+          description: Starting date/time
+          format: float
+        estimatedArrival:
+          type: number
+          description: Estimated arrival date/time
+          format: double
+        estimatedLength:
+          type: number
+          description: Estimated hike length in meters
+          format: float
+        waypoints:
+          type: array
+          description: 'Array of all planned hike waypoints (for route display, replaces field estimated length)'
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/location'
+        title:
+          type: string
+          description: Hike title
+        description:
+          type: string
+          description: Hike description
+        prefferedAgeband:
+          type: integer
+          description: The identifier of the preffered ageband chosen by the leader
+        cancelled:
+          type: boolean
+          description: Whether the hike is cancelled or not
+    location:
+      title: Location
+      type: object
+      description: Represents a location.
+      x-examples:
+        Example:
+          latitude: 50.1234
+          longitude: 10.5678
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+    member:
+      title: Member
+      type: object
+      description: Represents a registered user that can join and lead hikes.
+      x-examples:
+        Example:
+          id: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+          username: example-hiker
+          displayname: Example Hiker
+          hikesJoined: 17
+          hikesLed: 4
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f484bf6c-fc96-4dc6-ae3a-235085b3b7fd
+        username:
+          type: string
+        displayname:
+          type: string
+        hikesJoined:
+          type: integer
+          minimum: 0
+        hikesLed:
+          type: integer
+          minimum: 0
+  securitySchemes: {}
+tags:
+  - name: Hikes
+  - name: Members
